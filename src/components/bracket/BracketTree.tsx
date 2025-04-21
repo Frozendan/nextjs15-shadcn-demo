@@ -25,10 +25,10 @@ type BracketTreeProps = {
     rounds: Round[];
 };
 
-const cardHeight = 120; // Tăng chiều cao card để phù hợp với shadcn card
-const cardWidth = 160; // Tăng chiều rộng card
+const cardHeight = 90;
+const cardWidth = 160;
 const gapX = 64;
-const gapY = 20;
+const gapY = 30;
 
 function getTopOffset(round: number, index: number) {
     const spacing = cardHeight + gapY;
@@ -40,7 +40,6 @@ function getTopOffset(round: number, index: number) {
 export function BracketTree({ rounds }: BracketTreeProps) {
     const svgLines: JSX.Element[] = [];
 
-    // Calculate container height based on the first round (which has the most matches)
     const firstRound = rounds[0];
     const containerHeight = firstRound.matches.length * (cardHeight + gapY) + gapY * 2;
 
@@ -50,10 +49,11 @@ export function BracketTree({ rounds }: BracketTreeProps) {
 
         const x1 = r * (cardWidth + gapX) + cardWidth;
         const x2 = (r + 1) * (cardWidth + gapX);
+        const verticalOffset = 30;
 
         for (let i = 0; i < nextRound.matches.length; i++) {
-            const sourceY1 = getTopOffset(currentRound.round, i * 2) + cardHeight / 2;
-            const sourceY2 = getTopOffset(currentRound.round, i * 2 + 1) + cardHeight / 2;
+            const sourceY1 = getTopOffset(currentRound.round, i * 2) + cardHeight / 2 + verticalOffset;
+            const sourceY2 = getTopOffset(currentRound.round, i * 2 + 1) + cardHeight / 2 + verticalOffset;
             const midY = (sourceY1 + sourceY2) / 2;
             const midX = x1 + gapX / 2;
 
@@ -91,59 +91,79 @@ export function BracketTree({ rounds }: BracketTreeProps) {
     }
 
     return (
-        <div className='relative overflow-auto bg-gray-100' style={{ height: containerHeight }}>
-            {/* SVG lines */}
-            <svg className='pointer-events-none absolute top-0 left-0 h-full w-full'>{svgLines}</svg>
-
-            {/* Match cards */}
-            <div className='flex gap-x-16 px-8 py-8'>
-                {rounds.map((round, roundIndex) => (
-                    <div key={round.round} className='flex min-w-[180px] flex-col items-center'>
-                        <div className='mb-4 font-bold'>Round {round.round}</div>
+        <div className='relative flex w-full overflow-auto py-8' style={{ height: containerHeight }}>
+            {rounds.map((round, roundIndex) => {
+                return (
+                    <div key={`round-${round.round}`} className='relative flex-1'>
+                        <div key={`title-${round.round}`} className='mb-4 text-center font-bold'>
+                            Round {round.round}
+                        </div>
                         {round.matches.map((match, matchIndex) => (
-                            <Card
-                                key={match.id}
-                                className={cn(
-                                    'absolute w-[160px]',
-                                    match.winner?.id === match.team1.id && 'border-green-500',
-                                    match.winner?.id === match.team2.id && 'border-green-500'
+                            <div key={`match-${match.id}`} className='relative'>
+                                <div
+                                    style={{
+                                        height: '1px',
+                                        border: '1px solid #999',
+                                        width:
+                                            roundIndex === 0 || roundIndex === rounds.length - 1 ? cardWidth : '100%',
+                                        position: 'absolute',
+                                        right: roundIndex === rounds.length - 1 ? 'auto' : '0',
+                                        left: roundIndex === rounds.length - 1 ? '0' : 'auto',
+                                        top: getTopOffset(round.round, matchIndex) + cardHeight / 2
+                                    }}></div>
+                                {matchIndex % 2 === 1 && (
+                                    <div
+                                        style={{
+                                            width: '1px',
+                                            border: '1px solid #999',
+                                            height:
+                                                getTopOffset(round.round, matchIndex) -
+                                                getTopOffset(round.round, matchIndex - 1),
+                                            position: 'absolute',
+                                            top: getTopOffset(round.round, matchIndex - 1) + cardHeight / 2,
+                                            right: '0'
+                                        }}></div>
                                 )}
-                                style={{
-                                    left: roundIndex * (cardWidth + gapX),
-                                    top: getTopOffset(round.round, matchIndex)
-                                }}>
-                                <CardHeader className='p-3'>
-                                    <CardTitle className='text-center text-sm'>Match {match.id}</CardTitle>
-                                </CardHeader>
-                                <CardContent className='p-3 pt-0'>
-                                    <div className='space-y-2'>
-                                        <div
-                                            className={cn(
-                                                'flex items-center justify-between rounded p-1 text-sm',
-                                                match.winner?.id === match.team1.id && 'bg-green-50'
-                                            )}>
-                                            <span>{match.team1.name}</span>
-                                            {match.team1.score !== undefined && (
-                                                <span className='font-medium'>{match.team1.score}</span>
-                                            )}
+                                <Card
+                                    key={match.id}
+                                    className={cn(
+                                        'absolute left-1/2 w-[80%] -translate-x-1/2',
+                                        match.winner?.id === match.team1.id && 'border-green-500',
+                                        match.winner?.id === match.team2.id && 'border-green-500'
+                                    )}
+                                    style={{
+                                        top: getTopOffset(round.round, matchIndex)
+                                    }}>
+                                    <CardContent className='p-3'>
+                                        <div className='space-y-2'>
+                                            <div
+                                                className={cn(
+                                                    'flex items-center justify-between rounded p-1 text-sm',
+                                                    match.winner?.id === match.team1.id && 'bg-green-50'
+                                                )}>
+                                                <span>{match.team1.name}</span>
+                                                {match.team1.score !== undefined && (
+                                                    <span className='font-medium'>{match.team1.score}</span>
+                                                )}
+                                            </div>
+                                            <div
+                                                className={cn(
+                                                    'flex items-center justify-between rounded p-1 text-sm',
+                                                    match.winner?.id === match.team2.id && 'bg-green-50'
+                                                )}>
+                                                <span>{match.team2.name}</span>
+                                                {match.team2.score !== undefined && (
+                                                    <span className='font-medium'>{match.team2.score}</span>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div
-                                            className={cn(
-                                                'flex items-center justify-between rounded p-1 text-sm',
-                                                match.winner?.id === match.team2.id && 'bg-green-50'
-                                            )}>
-                                            <span>{match.team2.name}</span>
-                                            {match.team2.score !== undefined && (
-                                                <span className='font-medium'>{match.team2.score}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         ))}
                     </div>
-                ))}
-            </div>
+                );
+            })}
         </div>
     );
 }
