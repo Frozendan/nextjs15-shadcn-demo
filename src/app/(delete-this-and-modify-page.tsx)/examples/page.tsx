@@ -50,7 +50,7 @@ import { TooltipDemo } from '@/components/tooltip-demo';
 
 export default function SinkPage() {
     return (
-        <div className='mx-auto mt-4 grid max-w-7xl flex-1 gap-4'>
+        <div>
             <h2>These examples are taken from shadcn official repo on Github (https://github.com/shadcn-ui/ui)</h2>
             <ComponentWrapper name='chart' className='mt-4 w-full'>
                 <BracketDemo />

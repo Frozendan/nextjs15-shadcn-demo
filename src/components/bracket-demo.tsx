@@ -4,15 +4,18 @@ export function BracketDemo() {
     const rounds = [
         {
             round: 1,
+            roundName: "Round of 32",
             matches: [
                 {
                     id: 'cm8lv8gjb00006nbdmj71bij3',
+                    name: 'Match 1',
                     team1: { id: 'A32', name: 'Team A32', score: 2 },
                     team2: { id: 'A2', name: 'Team A2', score: 1 },
                     winner: { id: 'A32', name: 'Team A32' }
                 },
                 {
                     id: 'cm8lv8gjc00016nbdxcmsnmmt',
+                    name: 'Match 2',
                     team1: { id: 'A3', name: 'Team A3', score: 0 },
                     team2: { id: 'A20', name: 'Team A20', score: 1 },
                     winner: { id: 'A20', name: 'Team A20' }
@@ -105,9 +108,11 @@ export function BracketDemo() {
         },
         {
             round: 2,
+            roundName: "Round of 16",
             matches: [
                 {
                     id: 'cm8lv8gp5000g6nbd0amb0g0i',
+                    name: 'Round of 16 - Match 1',
                     team1: { id: 'A32', name: 'Team A32', score: 1 },
                     team2: { id: 'A24', name: 'Team A24', score: 2 },
                     winner: { id: 'A24', name: 'Team A24' }
@@ -158,9 +163,11 @@ export function BracketDemo() {
         },
         {
             round: 3,
+            roundName: "Quarter Finals",
             matches: [
                 {
                     id: 'cm8lv8h12000o6nbdvrnzedfw',
+                    name: 'Quarter Final 1',
                     team1: { id: 'A24', name: 'Team A24', score: 0 },
                     team2: { id: '', name: 'TBD', score: 0 },
                     winner: undefined
@@ -187,9 +194,11 @@ export function BracketDemo() {
         },
         {
             round: 4,
+            roundName: "Semi Finals",
             matches: [
                 {
                     id: 'cm8lv8h6p000s6nbdsia01zep',
+                    name: 'Semi Final 1',
                     team1: { id: '', name: 'TBD', score: 0 },
                     team2: { id: '', name: 'TBD', score: 0 },
                     winner: undefined
@@ -204,9 +213,11 @@ export function BracketDemo() {
         },
         {
             round: 5,
+            roundName: "Final",
             matches: [
                 {
                     id: 'cm8lv8h9b000u6nbdf6ryqfa8',
+                    name: 'Championship Match',
                     team1: { id: '', name: 'TBD', score: 0 },
                     team2: { id: '', name: 'TBD', score: 0 },
                     winner: undefined
@@ -215,5 +226,6 @@ export function BracketDemo() {
         }
     ];
 
-    return <BracketTree rounds={rounds} />;
+    //Can pass columnsToShow, accentColor and textColor as optional props
+    return <BracketTree rounds={rounds} columnsToShow={1.5} accentColor="#FF5733" textColor="#333333" />;
 }
