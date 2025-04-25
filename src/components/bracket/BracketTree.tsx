@@ -1,9 +1,8 @@
 'use client';
 
-import React, { JSX, useState } from 'react';
+import React, { JSX, useState, useEffect } from 'react';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { Button } from '@/registry/new-york-v4/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -83,8 +82,27 @@ export function BracketTree({ rounds, columnsToShow = 2, accentColor, textColor 
     const firstRound = rounds[0];
     const containerHeight = firstRound.matches.length * (cardHeight + gapY) + gapY * 2;
     const [startColumnIndex, setStartColumnIndex] = useState(0);
+    const [isDesktop, setIsDesktop] = useState(false);
 
-    const actualColumnsToShow = Math.max(1, Math.min(2, columnsToShow));
+    useEffect(() => {
+        const checkIfDesktop = () => {
+            setIsDesktop(window.innerWidth >= 768);
+        };
+
+        checkIfDesktop();
+
+        window.addEventListener('resize', checkIfDesktop);
+
+        return () => window.removeEventListener('resize', checkIfDesktop);
+    }, []);
+
+    useEffect(() => {
+        if (isDesktop) {
+            setStartColumnIndex(0);
+        }
+    }, [isDesktop]);
+
+    const actualColumnsToShow = isDesktop ? rounds.length : Math.max(1, Math.min(2, columnsToShow));
     const maxStartIndex = Math.max(0, rounds.length - Math.floor(actualColumnsToShow));
 
     const handleNext = () => {
@@ -122,7 +140,20 @@ export function BracketTree({ rounds, columnsToShow = 2, accentColor, textColor 
                     animate={{
                         x: `-${startColumnIndex * (100 / actualColumnsToShow)}%`
                     }}
-                    transition={springTransition}>
+                    transition={springTransition}
+                    onPanEnd={(e, { offset }) => {
+                        // Only handle swipe on mobile devices
+                        if (window.innerWidth >= 768) return;
+
+                        const swipe = offset.x;
+                        const swipeThreshold = 50;
+
+                        if (swipe < -swipeThreshold && startColumnIndex < maxStartIndex) {
+                            handleNext();
+                        } else if (swipe > swipeThreshold && startColumnIndex > 0) {
+                            handlePrevious();
+                        }
+                    }}>
 
                     {rounds.map((round, roundIndex) => {
                         return (
@@ -142,7 +173,7 @@ export function BracketTree({ rounds, columnsToShow = 2, accentColor, textColor 
                                                     border: '1px solid #999',
                                                     width:
                                                         roundIndex === 0 || roundIndex === rounds.length - 1
-                                                            ? '40px'
+                                                            ? '100px'
                                                             : '100%',
                                                     position: 'absolute',
                                                     right: roundIndex === rounds.length - 1 ? 'auto' : '0',
